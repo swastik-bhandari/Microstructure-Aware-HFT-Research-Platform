@@ -1,0 +1,757 @@
+
+<h2 class="sr-only">HFT Platform Complete Build Guide — Feature-by-Feature with Time Estimates</h2>
+
+<style>
+:root {
+  --accent: #1D9E75;
+  --accent-light: #E1F5EE;
+  --accent-dark: #085041;
+  --warn: #BA7517;
+  --warn-light: #FAEEDA;
+  --info: #185FA5;
+  --info-light: #E6F1FB;
+  --red: #993C1D;
+  --red-light: #FAECE7;
+}
+
+* { box-sizing: border-box; }
+
+.guide-wrap { font-size: 14px; padding: 0 0 2rem; }
+
+.hero {
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.hero h1 { font-size: 18px; font-weight: 500; margin: 0 0 6px; color: var(--color-text-primary); }
+.hero p { font-size: 13px; color: var(--color-text-secondary); margin: 0; line-height: 1.6; }
+
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.stat { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; }
+.stat .label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.stat .val { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.stat .sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+.layer-tabs { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+.tab-btn {
+  padding: 5px 14px; font-size: 13px; border: 0.5px solid var(--color-border-secondary);
+  border-radius: 20px; background: transparent; color: var(--color-text-secondary);
+  cursor: pointer; transition: all 0.15s;
+}
+.tab-btn:hover { background: var(--color-background-secondary); }
+.tab-btn.active { background: var(--color-background-primary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+
+.layer-card {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-background-primary);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.layer-header {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  display: flex; align-items: center; gap: 10px;
+}
+.layer-badge {
+  width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0;
+}
+.layer-title { font-weight: 500; font-size: 15px; flex: 1; }
+.time-badge {
+  font-size: 12px; padding: 3px 10px; border-radius: 12px;
+  background: var(--color-background-info); color: var(--color-text-info);
+}
+
+.feature-list { padding: 0; margin: 0; }
+.feature-item {
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: 10px; align-items: start;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  cursor: pointer; transition: background 0.1s;
+}
+.feature-item:last-child { border-bottom: none; }
+.feature-item:hover { background: var(--color-background-secondary); }
+.feature-item.open { background: var(--color-background-secondary); }
+
+.feat-num {
+  width: 22px; height: 22px; border-radius: 4px; font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center; margin-top: 1px; flex-shrink: 0;
+}
+.feat-body { min-width: 0; }
+.feat-title { font-weight: 500; font-size: 14px; color: var(--color-text-primary); margin-bottom: 2px; }
+.feat-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+.feat-hours { font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; padding-top: 2px; }
+
+.feat-detail {
+  background: var(--color-background-secondary);
+  border-top: 0.5px solid var(--color-border-tertiary);
+  padding: 1rem 1.25rem 1rem 3.5rem;
+  display: none;
+}
+.feat-detail.open { display: block; }
+
+.step-list { margin: 0; padding: 0; list-style: none; }
+.step-list li {
+  font-size: 13px; color: var(--color-text-secondary);
+  padding: 4px 0 4px 16px; position: relative; line-height: 1.5;
+}
+.step-list li::before {
+  content: '→'; position: absolute; left: 0; color: var(--color-text-tertiary);
+}
+
+.tech-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.tech-tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary);
+  color: var(--color-text-secondary);
+}
+
+.risk-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.risk-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.risk-text { font-size: 12px; color: var(--color-text-secondary); }
+
+.section-head { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 8px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.timeline-wrap {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem;
+  background: var(--color-background-primary);
+  margin-bottom: 1rem;
+}
+.wk-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.wk-label { font-size: 12px; color: var(--color-text-secondary); min-width: 68px; }
+.wk-bar-wrap { flex: 1; height: 20px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+.wk-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; }
+.wk-hrs { font-size: 11px; color: var(--color-text-tertiary); min-width: 46px; text-align: right; }
+
+.tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
+.tip-card {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 0.85rem 1rem;
+}
+.tip-card .tip-head { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--color-text-primary); }
+.tip-card ul { margin: 0; padding: 0 0 0 14px; }
+.tip-card li { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+</style>
+
+<div class="guide-wrap">
+
+<div class="hero">
+  <h1>HFT Research Platform — Complete Build Guide</h1>
+  <p>Feature-by-feature implementation plan for a 4-layer microstructure-aware HFT platform.<br>
+  C++ matching engine → Feature pipeline → RL agent → Backtesting. Click any feature to expand step-by-step instructions.</p>
+</div>
+
+<div class="stat-row">
+  <div class="stat">
+    <div class="label">Total features</div>
+    <div class="val">22</div>
+    <div class="sub">across 4 layers</div>
+  </div>
+  <div class="stat">
+    <div class="label">Estimated effort</div>
+    <div class="val">~540h</div>
+    <div class="sub">3 developers</div>
+  </div>
+  <div class="stat">
+    <div class="label">Timeline</div>
+    <div class="val">16 wks</div>
+    <div class="sub">semester schedule</div>
+  </div>
+  <div class="stat">
+    <div class="label">Primary risk</div>
+    <div class="val">Layer 1</div>
+    <div class="sub">C++ latency targets</div>
+  </div>
+</div>
+
+<div class="layer-tabs">
+  <button class="tab-btn active" onclick="showTab('all')">All features</button>
+  <button class="tab-btn" onclick="showTab('l1')">Layer 1 — C++ Engine</button>
+  <button class="tab-btn" onclick="showTab('l2')">Layer 2 — Features</button>
+  <button class="tab-btn" onclick="showTab('l3')">Layer 3 — RL Agent</button>
+  <button class="tab-btn" onclick="showTab('l4')">Layer 4 — Backtesting</button>
+  <button class="tab-btn" onclick="showTab('timeline')">Timeline view</button>
+</div>
+
+<!-- LAYER 1 -->
+<div class="layer-card" data-layer="l1">
+  <div class="layer-header">
+    <div class="layer-badge" style="background:#E1F5EE;color:#085041;">1</div>
+    <div class="layer-title">Layer 1 — C++ Limit Order Book Engine</div>
+    <div class="time-badge">Weeks 1–5 · ~140h</div>
+  </div>
+  <div class="feature-list">
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E1F5EE;color:#085041;">1.1</div>
+      <div class="feat-body">
+        <div class="feat-title">Core order book data structure</div>
+        <div class="feat-desc">Price-level map with time-priority queues for bid and ask sides</div>
+      </div>
+      <div class="feat-hours">~24h</div>
+    </div>
+    <div class="feat-detail">
+      <p class="section-head">Implementation steps</p>
+      <ul class="step-list">
+        <li>Define <code>Order</code> struct: id, side, price, qty, timestamp (nanosecond)</li>
+        <li>Use <code>std::map&lt;Price, std::deque&lt;Order&gt;&gt;</code> for bids (descending) and asks (ascending)</li>
+        <li>Implement <code>add_order()</code>, <code>cancel_order()</code>, <code>modify_order()</code></li>
+        <li>Write unit tests: correct best bid/ask after each mutation</li>
+        <li>Benchmark: time 1M insertions, target &lt;200ns amortised per op</li>
+      </ul>
+      <div class="tech-tags">
+        <span class="tech-tag">C++17</span><span class="tech-tag">std::map</span><span class="tech-tag">std::deque</span><span class="tech-tag">Google Test</span>
+      </div>
+      <div class="risk-row"><div class="risk-dot" style="background:#1D9E75;"></div><div class="risk-text">Risk: low — well-understood data structure</div></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E1F5EE;color:#085041;">1.2</div>
+      <div class="feat-body">
+        <div class="feat-title">Price-time priority matching engine</div>
+        <div class="feat-desc">Continuous matching of incoming orders against resting orders</div>
+      </div>
+      <div class="feat-hours">~28h</div>
+    </div>
+    <div class="feat-detail">
+      <p class="section-head">Implementation steps</p>
+      <ul class="step-list">
+        <li>Implement <code>match()</code>: walk resting queue at best price, fill in FIFO order</li>
+        <li>Handle partial fills: reduce resting order qty, emit fill events</li>
+        <li>Market orders: aggressively consume liquidity until filled or book exhausted</li>
+        <li>Limit orders: match if marketable, else rest at price level</li>
+        <li>Emit structured <code>FillEvent{aggressor_id, passive_id, price, qty, ts}</code></li>
+        <li>Unit test: cross orders, partial fills, self-trade prevention</li>
+      </ul>
+      <div class="tech-tags">
+        <span class="tech-tag">C++17</span><span class="tech-tag">event emission</span><span class="tech-tag">price-time priority</span>
+      </div>
+      <div class="risk-row"><div class="risk-dot" style="background:#BA7517;"></div><div class="risk-text">Risk: medium — edge cases in partial fill sequencing</div></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E1F5EE;color:#085041;">1.3</div>
+      <div class="feat-body">
+        <div class="feat-title">Lock-free ring buffer + memory pool</div>
+        <div class="feat-desc">Eliminate heap allocation and scheduling jitter under high event rates</div>
+      </div>
+      <div class="feat-hours">~30h</div>
+    </div>
+    <div class="feat-detail">
+      <p class="section-head">Implementation steps</p>
+      <ul class="step-list">
+        <li>Implement SPSC lock-free ring buffer using <code>std::atomic</code> head/tail</li>
+        <li>Pre-allocate a slab memory pool for <code>Order</code> objects — no runtime <code>new/delete</code></li>
+        <li>Cache-line align all hot structs (<code>alignas(64)</code>)</li>
+        <li>CPU-pin matching engine thread via <code>pthread_setaffinity_np</code></li>
+        <li>Benchmark with Google Benchmark: verify &gt;1M events/sec sustained throughput</li>
+        <li>Profile with <code>perf stat</code>: check cache-miss rate, branch mispredictions</li>
+      </ul>
+      <div class="tech-tags">
+        <span class="tech-tag">std::atomic</span><span class="tech-tag">alignas(64)</span><span class="tech-tag">Google Benchmark</span><span class="tech-tag">perf</span>
+      </div>
+      <div class="risk-row"><div class="risk-dot" style="background:#993C1D;"></div><div class="risk-text">Risk: high — hardest C++ feature; allow 1 extra week buffer</div></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E1F5EE;color:#085041;">1.4</div>
+      <div class="feat-body">
+        <div class="feat-title">Nanosecond timestamping</div>
+        <div class="feat-desc">High-resolution clock attached to every order event</div>
+      </div>
+      <div class="feat-hours">~8h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Use <code>std::chrono::high_resolution_clock::now()</code> on order receipt</li>
+        <li>Store as <code>int64_t</code> nanoseconds-since-epoch in Order struct</li>
+        <li>Validate resolution on target hardware with a timing microbenchmark</li>
+        <li>Fall back to <code>clock_gettime(CLOCK_MONOTONIC_RAW)</code> if needed</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">std::chrono</span><span class="tech-tag">CLOCK_MONOTONIC_RAW</span></div>
+      <div class="risk-row"><div class="risk-dot" style="background:#1D9E75;"></div><div class="risk-text">Risk: low</div></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E1F5EE;color:#085041;">1.5</div>
+      <div class="feat-body">
+        <div class="feat-title">Python bindings (pybind11)</div>
+        <div class="feat-desc">Expose C++ LOB engine to the Python research stack</div>
+      </div>
+      <div class="feat-hours">~20h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Add pybind11 as a CMake submodule</li>
+        <li>Expose <code>OrderBook</code> class: <code>submit_order()</code>, <code>cancel()</code>, <code>get_bbo()</code>, <code>get_depth(n)</code></li>
+        <li>Return LOB snapshots as NumPy structured arrays for zero-copy speed</li>
+        <li>Write Python integration tests: match Python-side order submission to C++ fill events</li>
+        <li>Measure Python→C++ roundtrip overhead; document in README</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">pybind11</span><span class="tech-tag">NumPy</span><span class="tech-tag">CMake</span></div>
+      <div class="risk-row"><div class="risk-dot" style="background:#BA7517;"></div><div class="risk-text">Risk: medium — GIL interaction with callbacks</div></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E1F5EE;color:#085041;">1.6</div>
+      <div class="feat-body">
+        <div class="feat-title">Synthetic market data generator</div>
+        <div class="feat-desc">Python generator producing realistic LOB event streams</div>
+      </div>
+      <div class="feat-hours">~30h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Model order arrivals as a Poisson process (configurable λ)</li>
+        <li>Spread distribution: log-normal parameterised by tick size and regime</li>
+        <li>Depth profile: exponential decay from best quote</li>
+        <li>Add 3 regime modes: trending, mean-reverting, volatile/crisis</li>
+        <li>Validate against stylised facts: fat tails, volatility clustering, bid-ask bounce</li>
+        <li>Export as Pandas DataFrame and as live event iterator</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">Python 3.11</span><span class="tech-tag">NumPy</span><span class="tech-tag">Pandas</span><span class="tech-tag">scipy.stats</span></div>
+      <div class="risk-row"><div class="risk-dot" style="background:#BA7517;"></div><div class="risk-text">Risk: medium — calibration to stylised facts takes iteration</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LAYER 2 -->
+<div class="layer-card" data-layer="l2">
+  <div class="layer-header">
+    <div class="layer-badge" style="background:#E6F1FB;color:#0C447C;">2</div>
+    <div class="layer-title">Layer 2 — Microstructure Feature Engine</div>
+    <div class="time-badge">Weeks 6–7 · ~70h</div>
+  </div>
+  <div class="feature-list">
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E6F1FB;color:#0C447C;">2.1</div>
+      <div class="feat-body">
+        <div class="feat-title">Bid-ask spread + order book imbalance (OBI)</div>
+        <div class="feat-desc">Core price-level signals computed on every LOB update</div>
+      </div>
+      <div class="feat-hours">~14h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Spread: <code>(best_ask - best_bid) / mid_price</code>, normalised; update on every quote change</li>
+        <li>OBI: <code>bid_vol / (bid_vol + ask_vol)</code> at best quote level</li>
+        <li>Extend OBI to N levels: weighted sum over top-5 levels</li>
+        <li>Test: on a flat synthetic book OBI should be exactly 0.5</li>
+        <li>Benchmark: all 6 features within 1µs of LOB update (use <code>rdtsc</code>)</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">Python</span><span class="tech-tag">NumPy</span><span class="tech-tag">inline C++</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E6F1FB;color:#0C447C;">2.2</div>
+      <div class="feat-body">
+        <div class="feat-title">Queue position estimator</div>
+        <div class="feat-desc">Estimated rank of a resting limit order within its price queue</div>
+      </div>
+      <div class="feat-hours">~12h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Track cumulative volume ahead of our order at its price level</li>
+        <li>Update on each fill/cancel at that level</li>
+        <li>Derive fill probability: <code>P(fill) ≈ exp(-λ · queue_pos / arrival_rate)</code></li>
+        <li>Validate on a controlled synthetic stream with known arrival rate</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">C++ event handler</span><span class="tech-tag">Python validation</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E6F1FB;color:#0C447C;">2.3</div>
+      <div class="feat-body">
+        <div class="feat-title">Trade intensity + short-term volatility</div>
+        <div class="feat-desc">EWMA trade count and rolling realised volatility signals</div>
+      </div>
+      <div class="feat-hours">~12h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Trade intensity: EWMA of trade count per unit time, span configurable (default 20 trades)</li>
+        <li>Volatility: rolling sum of squared mid-price changes over last N ticks</li>
+        <li>Expose both as scalar floats in the state vector; normalise by historical mean/std</li>
+        <li>Plot feature distributions across 3 synthetic regimes to verify regime-sensitivity</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">NumPy EWMA</span><span class="tech-tag">pandas rolling</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E6F1FB;color:#0C447C;">2.4</div>
+      <div class="feat-body">
+        <div class="feat-title">Liquidity depth curves</div>
+        <div class="feat-desc">Cumulative volume at successive price levels — full book shape</div>
+      </div>
+      <div class="feat-hours">~10h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Extract top-10 bid/ask levels: <code>[(price, cum_vol)]</code> array</li>
+        <li>Compute slope of depth curve as a single scalar feature (proxy for liquidity)</li>
+        <li>Visualise with matplotlib to sanity-check shape on trending vs volatile regimes</li>
+        <li>Flatten to fixed-length NumPy array as part of state vector</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">NumPy</span><span class="tech-tag">matplotlib</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#E6F1FB;color:#0C447C;">2.5</div>
+      <div class="feat-body">
+        <div class="feat-title">Streaming feature pipeline</div>
+        <div class="feat-desc">Real-time state vector assembly for consumption by RL agent</div>
+      </div>
+      <div class="feat-hours">~22h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Design <code>StateVector</code> dataclass: spread, OBI, queue_pos, intensity, vol, depth[20]</li>
+        <li>Hook into pybind11 LOB callbacks: update features on every tick</li>
+        <li>Normalise all features online using running mean/std (Welford's algorithm)</li>
+        <li>Log full feature stream to Parquet for offline analysis</li>
+        <li>Unit test: feed replayed event log, compare feature output to offline computation</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">Python dataclass</span><span class="tech-tag">Parquet</span><span class="tech-tag">Welford normalisation</span></div>
+      <div class="risk-row"><div class="risk-dot" style="background:#BA7517;"></div><div class="risk-text">Risk: medium — online normalisation drift under non-stationary regimes</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LAYER 3 -->
+<div class="layer-card" data-layer="l3">
+  <div class="layer-header">
+    <div class="layer-badge" style="background:#FAEEDA;color:#633806;">3</div>
+    <div class="layer-title">Layer 3 — Research Models & RL Agent</div>
+    <div class="time-badge">Weeks 8–13 · ~200h</div>
+  </div>
+  <div class="feature-list">
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAEEDA;color:#633806;">3.1</div>
+      <div class="feat-body">
+        <div class="feat-title">TWAP, VWAP, and POV baselines</div>
+        <div class="feat-desc">Classical execution strategies as benchmarks</div>
+      </div>
+      <div class="feat-hours">~20h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>TWAP: divide target qty into T equal slices, submit one per interval</li>
+        <li>VWAP: compute expected volume profile from historical data; weight slices proportionally</li>
+        <li>POV: at each step submit <code>participation_rate × observed_market_volume</code></li>
+        <li>Wrap all three in a common <code>Strategy</code> interface: <code>act(state) → Action</code></li>
+        <li>Run each against 1000 synthetic episodes; record all metrics to CSV</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">Python</span><span class="tech-tag">Pandas</span><span class="tech-tag">common Strategy interface</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAEEDA;color:#633806;">3.2</div>
+      <div class="feat-body">
+        <div class="feat-title">ARIMA spread prediction + Kalman filter</div>
+        <div class="feat-desc">Statistical models as intermediate complexity baselines</div>
+      </div>
+      <div class="feat-hours">~22h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Fit ARIMA(1,0,1) on spread time series; predict next tick spread</li>
+        <li>Kalman filter: track hidden mid-price trend state; use innovation as signal</li>
+        <li>Route strategy: if spread predicted to narrow → post limit; else → market order</li>
+        <li>Compare to TWAP baseline on same synthetic episodes</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">statsmodels</span><span class="tech-tag">pykalman</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAEEDA;color:#633806;">3.3</div>
+      <div class="feat-body">
+        <div class="feat-title">CNN-LSTM mid-price direction model</div>
+        <div class="feat-desc">Deep learning feature model producing directional signal for RL state</div>
+      </div>
+      <div class="feat-hours">~40h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Input: rolling window of LOB snapshots, shape <code>[T, 40]</code> (top-10 bid/ask price+vol)</li>
+        <li>Architecture: 2× Conv1D (32 filters, k=3) → LSTM(64) → Dense(3) (up/flat/down)</li>
+        <li>Label: mid-price direction over next 5 ticks</li>
+        <li>Train/val split by episode; report accuracy, precision, recall per class</li>
+        <li>Export <code>model.pt</code>; wrap in <code>DirectionalSignal</code> class that returns P(up) scalar</li>
+        <li>Add P(up) as feature 7 in the RL state vector</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">PyTorch 2.x</span><span class="tech-tag">Conv1d</span><span class="tech-tag">LSTM</span><span class="tech-tag">torchmetrics</span></div>
+      <div class="risk-row"><div class="risk-dot" style="background:#BA7517;"></div><div class="risk-text">Risk: medium — synthetic data distribution shift from real LOB</div></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAEEDA;color:#633806;">3.4</div>
+      <div class="feat-body">
+        <div class="feat-title">Gymnasium RL environment wrapper</div>
+        <div class="feat-desc">Wraps Layers 1–2 into a standard Gym interface for PPO training</div>
+      </div>
+      <div class="feat-hours">~28h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Subclass <code>gymnasium.Env</code>; define <code>observation_space</code> and <code>action_space</code></li>
+        <li>Observation: <code>Box(shape=(N_features,))</code> — all normalised features</li>
+        <li>Action space: <code>Discrete(3)</code> — market order, limit order, hold</li>
+        <li>Episode: fixed inventory to liquidate within fixed time horizon</li>
+        <li><code>step()</code>: submit action to C++ LOB, advance clock, return (obs, reward, done, info)</li>
+        <li>Reward: negative implementation shortfall per step</li>
+        <li>Test with <code>stable_baselines3.common.env_checker.check_env()</code></li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">Gymnasium</span><span class="tech-tag">pybind11 bridge</span><span class="tech-tag">env checker</span></div>
+      <div class="risk-row"><div class="risk-dot" style="background:#993C1D;"></div><div class="risk-text">Risk: high — reward shaping bugs create silent agent failure modes</div></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAEEDA;color:#633806;">3.5</div>
+      <div class="feat-body">
+        <div class="feat-title">PPO execution agent (training)</div>
+        <div class="feat-desc">Proximal Policy Optimisation agent trained to minimise implementation shortfall</div>
+      </div>
+      <div class="feat-hours">~50h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Start with SB3's PPO as scaffold; customise actor-critic network heads</li>
+        <li>Actor: MLP(128,128) → logits over 3 actions</li>
+        <li>Critic: MLP(128,128) → scalar V(s)</li>
+        <li>Hyperparameter sweep: lr ∈ {1e-4, 3e-4}, clip ε ∈ {0.1, 0.2}, entropy coeff</li>
+        <li>Train for 10M steps; log to TensorBoard (episode reward, entropy, value loss)</li>
+        <li>Checkpoint every 500k steps; keep best by eval episode shortfall</li>
+        <li>Evaluate: 1000 held-out episodes per checkpoint; plot learning curves</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">PyTorch 2.x</span><span class="tech-tag">stable-baselines3</span><span class="tech-tag">TensorBoard</span></div>
+      <div class="risk-row"><div class="risk-dot" style="background:#993C1D;"></div><div class="risk-text">Risk: high — reward engineering is the biggest research uncertainty</div></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAEEDA;color:#633806;">3.6</div>
+      <div class="feat-body">
+        <div class="feat-title">Transformer variant (Wallbridge)</div>
+        <div class="feat-desc">Causal-convolution transformer on LOB sequences as comparison point</div>
+      </div>
+      <div class="feat-hours">~30h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Implement causal 1D conv (dilated) + masked self-attention block in PyTorch</li>
+        <li>Same input/output spec as CNN-LSTM (3-class direction); compare accuracy</li>
+        <li>If accuracy improvement &lt;2%, use CNN-LSTM in RL state — document the ablation</li>
+        <li>Include both in final paper comparison table</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">PyTorch</span><span class="tech-tag">nn.MultiheadAttention</span></div>
+      <div class="risk-row"><div class="risk-dot" style="background:#BA7517;"></div><div class="risk-text">Risk: medium — can deprioritise if behind schedule; CNN-LSTM suffices</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LAYER 4 -->
+<div class="layer-card" data-layer="l4">
+  <div class="layer-header">
+    <div class="layer-badge" style="background:#FAECE7;color:#712B13;">4</div>
+    <div class="layer-title">Layer 4 — Execution & Backtesting Engine</div>
+    <div class="time-badge">Weeks 8–9, 14–15 · ~130h</div>
+  </div>
+  <div class="feature-list">
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAECE7;color:#712B13;">4.1</div>
+      <div class="feat-body">
+        <div class="feat-title">Latency model + partial fill simulation</div>
+        <div class="feat-desc">Empirical round-trip delay and realistic fill matching</div>
+      </div>
+      <div class="feat-hours">~28h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Parameterise latency as log-normal; calibrate p50/p99 from config</li>
+        <li>On order submission: sample delay, advance simulated clock, submit to LOB</li>
+        <li>Partial fill: match arriving order against LOB state at arrival time (not submission time)</li>
+        <li>Validate: run TWAP 1000× and confirm p50/p99 latency matches config params</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">Python</span><span class="tech-tag">scipy.stats.lognorm</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAECE7;color:#712B13;">4.2</div>
+      <div class="feat-body">
+        <div class="feat-title">Slippage + market impact model</div>
+        <div class="feat-desc">Square-root impact approximation and transaction cost accounting</div>
+      </div>
+      <div class="feat-hours">~24h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Square-root impact: <code>ΔP = σ · sqrt(Q / ADV)</code>, applied to execution price</li>
+        <li>Transaction costs: fixed per-share fee + exchange rebate for passive fills</li>
+        <li>Queue priority decay: resting limit order loses queue position as newer orders arrive</li>
+        <li>Validate impact model against known analytical VWAP trajectory (Barzykin & Lillo)</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">NumPy</span><span class="tech-tag">analytical validation</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAECE7;color:#712B13;">4.3</div>
+      <div class="feat-body">
+        <div class="feat-title">Metrics engine</div>
+        <div class="feat-desc">Compute all execution quality and latency metrics per episode</div>
+      </div>
+      <div class="feat-hours">~18h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Slippage (bps), market impact (bps), fill rate (%), PnL, execution variance</li>
+        <li>Latency percentiles: p50, p99, p99.9 per strategy run</li>
+        <li>Write <code>MetricsReport</code> to JSON + Parquet for each episode batch</li>
+        <li>Bootstrap CI on all metrics (1000 resample) for statistical significance</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">pandas</span><span class="tech-tag">scipy.stats</span><span class="tech-tag">bootstrap CI</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAECE7;color:#712B13;">4.4</div>
+      <div class="feat-body">
+        <div class="feat-title">Comparative evaluation harness</div>
+        <div class="feat-desc">Run all strategies under identical conditions; produce paper-ready tables</div>
+      </div>
+      <div class="feat-hours">~28h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Seed-controlled episodes: same synthetic data seen by all strategies</li>
+        <li>Run 3 market regimes × 5 strategies × 1000 episodes each</li>
+        <li>Produce LaTeX table with mean ± std for all metrics</li>
+        <li>Statistical significance test: Wilcoxon signed-rank PPO vs TWAP/VWAP</li>
+        <li>Ablation: PPO without CNN-LSTM signal vs. with — quantify contribution</li>
+        <li>Generate matplotlib figures: CDF of slippage, learning curve, latency histogram</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">Python</span><span class="tech-tag">scipy.stats.wilcoxon</span><span class="tech-tag">matplotlib</span><span class="tech-tag">LaTeX</span></div>
+    </div>
+
+    <div class="feature-item" onclick="toggleFeat(this)">
+      <div class="feat-num" style="background:#FAECE7;color:#712B13;">4.5</div>
+      <div class="feat-body">
+        <div class="feat-title">Reproducibility + logging infrastructure</div>
+        <div class="feat-desc">Seed logging, version control, and artefact management</div>
+      </div>
+      <div class="feat-hours">~12h</div>
+    </div>
+    <div class="feat-detail">
+      <ul class="step-list">
+        <li>Log all random seeds, regime params, hyperparameters to YAML config per run</li>
+        <li>Git-tag every experimental run; store config hash in results filename</li>
+        <li>Dockerfile for reproducible environment (Ubuntu 22.04, GCC 12, Python 3.11, CUDA)</li>
+        <li>README: &lt;5 command install-to-first-result flow</li>
+      </ul>
+      <div class="tech-tags"><span class="tech-tag">Docker</span><span class="tech-tag">YAML</span><span class="tech-tag">git tags</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TIMELINE VIEW -->
+<div id="timeline-view" style="display:none;">
+  <div class="timeline-wrap">
+    <p class="section-head" style="margin-bottom:12px;">Week-by-week effort distribution (estimated hours)</p>
+
+    <div class="wk-row"><div class="wk-label">Weeks 1–2</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:55%;background:#9FE1CB;color:#04342C;">LOB data structure</div></div><div class="wk-hrs">~50h</div></div>
+    <div class="wk-row"><div class="wk-label">Weeks 3–4</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:65%;background:#5DCAA5;color:#04342C;">Matching engine + lock-free buffers</div></div><div class="wk-hrs">~60h</div></div>
+    <div class="wk-row"><div class="wk-label">Week 5</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:42%;background:#1D9E75;color:#E1F5EE;">pybind11 + data generator</div></div><div class="wk-hrs">~38h</div></div>
+    <div class="wk-row"><div class="wk-label">Weeks 6–7</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:75%;background:#B5D4F4;color:#042C53;">All 6 microstructure features</div></div><div class="wk-hrs">~70h</div></div>
+    <div class="wk-row"><div class="wk-label">Weeks 8–9</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:58%;background:#FAC775;color:#412402;">Baselines + backtesting engine</div></div><div class="wk-hrs">~54h</div></div>
+    <div class="wk-row"><div class="wk-label">Weeks 10–11</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:65%;background:#EF9F27;color:#412402;">CNN-LSTM + Transformer</div></div><div class="wk-hrs">~62h</div></div>
+    <div class="wk-row"><div class="wk-label">Weeks 12–13</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:88%;background:#BA7517;color:#FAEEDA;">PPO training + Gym env + tuning</div></div><div class="wk-hrs">~80h</div></div>
+    <div class="wk-row"><div class="wk-label">Weeks 14–15</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:52%;background:#F0997B;color:#4A1B0C;">Comparative experiments</div></div><div class="wk-hrs">~48h</div></div>
+    <div class="wk-row"><div class="wk-label">Week 16</div><div class="wk-bar-wrap"><div class="wk-bar" style="width:30%;background:#c9c9c0;color:#2C2C2A;">Write-up + paper draft</div></div><div class="wk-hrs">~28h</div></div>
+  </div>
+
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-head" style="color:#993C1D;">Critical path risks</div>
+      <ul>
+        <li>Lock-free ring buffer (1.3) — start week 3, not week 4</li>
+        <li>pybind11 GIL interactions — test early with multi-threaded LOB + Python callbacks</li>
+        <li>Reward shaping for PPO (3.5) — do a 2-day spike in week 9 before committing to architecture</li>
+        <li>GPU availability — reserve shared GPU for weeks 10–13; PPO training &lt;24h target</li>
+      </ul>
+    </div>
+    <div class="tip-card">
+      <div class="tip-head" style="color:#185FA5;">Team split suggestion</div>
+      <ul>
+        <li>Swastik — Layer 1 (C++ engine, pybind11); weeks 1–5</li>
+        <li>Aalok — Layers 2 + 4 (features, backtesting); weeks 6–9, 14–15</li>
+        <li>Sameer — Layer 3 (CNN-LSTM, PPO, Gym env); weeks 8–13</li>
+        <li>All three converge on evaluation + write-up, weeks 14–16</li>
+      </ul>
+    </div>
+    <div class="tip-card">
+      <div class="tip-head" style="color:#085041;">Scope cuts if behind</div>
+      <ul>
+        <li>Drop transformer variant (3.6) — CNN-LSTM is sufficient for the paper</li>
+        <li>Reduce to 2 market regimes instead of 3</li>
+        <li>Skip ARIMA/Kalman (3.2) — TWAP/VWAP/POV baselines are enough</li>
+        <li>Reduce episode count from 1000 to 200 per regime</li>
+      </ul>
+    </div>
+    <div class="tip-card">
+      <div class="tip-head" style="color:#633806;">Definition of done</div>
+      <ul>
+        <li>C++ engine: &gt;1M events/sec on single core, unit tests green</li>
+        <li>Features: all 6 within 1µs, validated on controlled data</li>
+        <li>PPO: statistically significant improvement over TWAP on slippage</li>
+        <li>Platform: reproducible end-to-end in Docker with &lt;5 commands</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function toggleFeat(item) {
+  const detail = item.nextElementSibling;
+  if (!detail || !detail.classList.contains('feat-detail')) return;
+  const isOpen = detail.classList.contains('open');
+  detail.classList.toggle('open', !isOpen);
+  item.classList.toggle('open', !isOpen);
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const layers = document.querySelectorAll('.layer-card');
+  const tl = document.getElementById('timeline-view');
+
+  if (tab === 'timeline') {
+    layers.forEach(l => l.style.display = 'none');
+    tl.style.display = 'block';
+    return;
+  }
+  tl.style.display = 'none';
+
+  layers.forEach(l => {
+    if (tab === 'all') {
+      l.style.display = 'block';
+    } else {
+      l.style.display = l.dataset.layer === tab ? 'block' : 'none';
+    }
+  });
+}
+</script>
