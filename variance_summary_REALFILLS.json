@@ -1,0 +1,39 @@
+{
+  "fill_model": "real_trade_attribution",
+  "tape_file": "trade_tape_eth_20251201.npz",
+  "states_file": "states_eth_20251201.csv",
+  "config": {
+    "runs": 5,
+    "timesteps": 100000,
+    "target_qty": 10.0,
+    "horizon": 60,
+    "eval_episodes": 300,
+    "seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004
+    ],
+    "ppo": {
+      "policy": "MlpPolicy",
+      "n_steps": 2048,
+      "batch_size": 256,
+      "device": "cpu"
+    }
+  },
+  "results": {
+    "ppo6_mean_bps": 41.631939375205974,
+    "ppo6_std_bps": 1.579584712014155,
+    "ppo7_mean_bps": 41.75292811873605,
+    "ppo7_std_bps": 2.163275968117121,
+    "vwap_bps": 41.70936067112883,
+    "twap_bps": 42.81490401636156,
+    "pov_bps": 46.067186384575905,
+    "passive_bps": 167.69529975440747,
+    "cnn_lstm_contribution_mean_bps": -0.12098874353007574,
+    "cnn_lstm_contribution_stderr_bps": 0.6585292272602487,
+    "cnn_lstm_significant": false,
+    "ppo_vs_best_classical_bps": 0.07742129592285352
+  }
+}

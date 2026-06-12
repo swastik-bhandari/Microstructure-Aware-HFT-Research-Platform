@@ -1,0 +1,39 @@
+{
+  "fill_model": "proxy",
+  "tape_file": "none",
+  "states_file": "states_eth_20251201.csv",
+  "config": {
+    "runs": 5,
+    "timesteps": 100000,
+    "target_qty": 10.0,
+    "horizon": 60,
+    "eval_episodes": 300,
+    "seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004
+    ],
+    "ppo": {
+      "policy": "MlpPolicy",
+      "n_steps": 2048,
+      "batch_size": 256,
+      "device": "cpu"
+    }
+  },
+  "results": {
+    "ppo6_mean_bps": 22.443140653350586,
+    "ppo6_std_bps": 1.8718606586377384,
+    "ppo7_mean_bps": 22.603496989071992,
+    "ppo7_std_bps": 0.373624790101075,
+    "vwap_bps": 41.70936067112883,
+    "twap_bps": 42.81490401636156,
+    "pov_bps": 46.067186384575905,
+    "passive_bps": 53.182133053172954,
+    "cnn_lstm_contribution_mean_bps": -0.16035633572140712,
+    "cnn_lstm_contribution_stderr_bps": 0.9188916202544319,
+    "cnn_lstm_significant": false,
+    "ppo_vs_best_classical_bps": 19.26622001777824
+  }
+}
