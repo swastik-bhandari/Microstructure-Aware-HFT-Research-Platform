@@ -81,6 +81,47 @@ def run_vwap_ep(env, start):
     return float(sf)
 
 
+def run_twap_ep(env, start):
+    """TWAP from a fixed start: equal market slice every step (default slice)."""
+    reset_to(env, start)
+    done, info = False, {}
+    while not done:
+        _, _, term, trunc, info = env.step(2)   # market, default time-uniform slice
+        done = term or trunc
+    return float(info.get("shortfall_bps", np.nan))
+
+
+def run_pov_ep(env, start, participation=0.20):
+    """POV from a fixed start: volume-share slice with catch-up floor."""
+    reset_to(env, start)
+    H = env.H
+    vol = env.intensity[start:start + H].astype(np.float64)
+    total_vol = vol.sum()
+    if total_vol <= 0:
+        vol = np.ones(H); total_vol = H
+    done, info, step_i = False, {}, 0
+    while not done:
+        vol_share = vol[min(step_i, H - 1)] / total_vol
+        slice_qty = env.target_qty * vol_share * (1.0 + participation)
+        steps_left = max(env.steps_left, 1)
+        slice_qty = max(slice_qty, (env.inventory / steps_left) * 0.5)
+        slice_qty = min(slice_qty, env.inventory)
+        _, _, term, trunc, info = env.step(2, qty_override=slice_qty)
+        done = term or trunc
+        step_i += 1
+    return float(info.get("shortfall_bps", np.nan))
+
+
+def run_passive_ep(env, start):
+    """Naive passive from a fixed start: always post limit, forced liq at end."""
+    reset_to(env, start)
+    done, info = False, {}
+    while not done:
+        _, _, term, trunc, info = env.step(1)   # limit every step
+        done = term or trunc
+    return float(info.get("shortfall_bps", np.nan))
+
+
 # ── stats helpers ─────────────────────────────────────────────────────────────
 
 def summarise(arr):
@@ -125,7 +166,7 @@ def main():
 
     # ── output files ─────────────────────────────────────────────────────────
     raw_fields = ["seed","episode","start_local","start_idx_abs",
-                  "static_bps","sizeaware_bps","vwap_bps",
+                  "static_bps","sizeaware_bps","vwap_bps","twap_bps","pov_bps","passive_bps",
                   "static_vs_vwap","sizeaware_vs_vwap","sizeaware_vs_static"]
     raw_f   = open(args.out_raw,   "w", newline="")
     seeds_f = open(args.out_seeds, "w", newline="")
@@ -134,12 +175,14 @@ def main():
         "seed","static_mean","static_median","static_std",
         "sizeaware_mean","sizeaware_median","sizeaware_std",
         "vwap_mean","vwap_median","vwap_std",
+        "twap_mean","pov_mean","passive_mean",
         "static_beats_vwap","sizeaware_beats_vwap","sizeaware_beats_static"]);
     seed_w.writeheader()
 
     # ── collect per-seed means for the "mean of means" aggregate ─────────────
-    seed_means = {"static": [], "sizeaware": [], "vwap": []}
+    seed_means = {"static": [], "sizeaware": [], "vwap": [], "twap": [], "pov": [], "passive": []}
     all_static, all_sa, all_vwap = [], [], []
+    all_twap, all_pov, all_passive = [], [], []
     all_sv, all_sav, all_sas = [], [], []
 
     t0 = time.time()
@@ -167,13 +210,18 @@ def main():
         starts = [int(rng.integers(0, max_start)) for _ in range(args.n)]
 
         st_bps, sa_bps, vw_bps = [], [], []
+        tw_bps, pv_bps, pa_bps = [], [], []
 
         for ep, start in enumerate(starts):
             sf_st = run_ppo_ep(m_static, env_st, start)
             sf_sa = run_ppo_ep(m_sa,     env_sa, start)
             sf_vw = run_vwap_ep(env_vw,          start)
+            sf_tw = run_twap_ep(env_vw,          start)
+            sf_pv = run_pov_ep(env_vw,           start)
+            sf_pa = run_passive_ep(env_vw,       start)
 
             st_bps.append(sf_st); sa_bps.append(sf_sa); vw_bps.append(sf_vw)
+            tw_bps.append(sf_tw); pv_bps.append(sf_pv); pa_bps.append(sf_pa)
 
             raw_w.writerow({
                 "seed": seed, "episode": ep,
@@ -181,6 +229,9 @@ def main():
                 "static_bps":       round(sf_st, 3),
                 "sizeaware_bps":    round(sf_sa, 3),
                 "vwap_bps":         round(sf_vw, 3),
+                "twap_bps":         round(sf_tw, 3),
+                "pov_bps":          round(sf_pv, 3),
+                "passive_bps":      round(sf_pa, 3),
                 "static_vs_vwap":   round(sf_st - sf_vw, 3),
                 "sizeaware_vs_vwap": round(sf_sa - sf_vw, 3),
                 "sizeaware_vs_static": round(sf_sa - sf_st, 3),
@@ -191,7 +242,9 @@ def main():
                 print(f"  ep {ep+1:>3}/{args.n} | "
                       f"static {np.mean(st_bps):.1f} | "
                       f"sizeaware {np.mean(sa_bps):.1f} | "
-                      f"vwap {np.mean(vw_bps):.1f} bps  [{elapsed:.0f}s]")
+                      f"vwap {np.mean(vw_bps):.1f} | "
+                      f"twap {np.mean(tw_bps):.0f} | pov {np.mean(pv_bps):.1f} | "
+                      f"passive {np.mean(pa_bps):.0f} bps  [{elapsed:.0f}s]")
 
         raw_f.flush()
 
@@ -215,6 +268,9 @@ def main():
             "vwap_mean":   round(float(np.mean(vw_bps)), 3),
             "vwap_median": round(float(np.median(vw_bps)), 3),
             "vwap_std":    round(float(np.std(vw_bps)), 3),
+            "twap_mean":    round(float(np.mean(tw_bps)), 3),
+            "pov_mean":     round(float(np.mean(pv_bps)), 3),
+            "passive_mean": round(float(np.mean(pa_bps)), 3),
             "static_beats_vwap":    static_beats_vwap,
             "sizeaware_beats_vwap": sizeaware_beats_vwap,
             "sizeaware_beats_static": sizeaware_beats_static,
@@ -225,13 +281,19 @@ def main():
         seed_means["static"].append(float(np.mean(st_bps)))
         seed_means["sizeaware"].append(float(np.mean(sa_bps)))
         seed_means["vwap"].append(float(np.mean(vw_bps)))
+        seed_means["twap"].append(float(np.mean(tw_bps)))
+        seed_means["pov"].append(float(np.mean(pv_bps)))
+        seed_means["passive"].append(float(np.mean(pa_bps)))
         all_static.extend(st_bps); all_sa.extend(sa_bps); all_vwap.extend(vw_bps)
+        all_twap.extend(tw_bps); all_pov.extend(pv_bps); all_passive.extend(pa_bps)
         all_sv.extend(sv.tolist()); all_sav.extend(sav.tolist()); all_sas.extend(sas.tolist())
 
         print(f"  seed {seed} DONE | "
               f"static {np.mean(st_bps):.2f} | "
               f"sizeaware {np.mean(sa_bps):.2f} | "
               f"vwap {np.mean(vw_bps):.2f} | "
+              f"twap {np.mean(tw_bps):.1f} | pov {np.mean(pv_bps):.1f} | "
+              f"passive {np.mean(pa_bps):.1f} | "
               f"sa beats vwap {sizeaware_beats_vwap}/{args.n}")
 
     raw_f.close(); seeds_f.close()
@@ -258,11 +320,17 @@ def main():
             "static_bps":    round(mom_static, 3),
             "sizeaware_bps": round(mom_sa,     3),
             "vwap_bps":      round(mom_vwap,   3),
+            "twap_bps":      round(float(np.mean(seed_means["twap"])),    3),
+            "pov_bps":       round(float(np.mean(seed_means["pov"])),     3),
+            "passive_bps":   round(float(np.mean(seed_means["passive"])), 3),
         },
         "pooled_1500": {
             "static":    summarise(all_static),
             "sizeaware": summarise(all_sa),
             "vwap":      summarise(all_vwap),
+            "twap":      summarise(all_twap),
+            "pov":       summarise(all_pov),
+            "passive":   summarise(all_passive),
         },
         "gaps_pooled": {
             "static_vs_vwap":      summarise(all_sv),
@@ -303,6 +371,14 @@ def main():
           f"{'':>10} "
           f"{summary['win_rates_pooled']['sizeaware_beats_static']['pct']:>9.1f}%")
     print(f"\nruntime: {total_time:.0f}s")
+
+    # classical baselines (single column means — supporting, not the headline)
+    print(f"\n{'CLASSICAL BASELINES (pooled mean bps)':40}")
+    print(f"  {'VWAP':12} {np.mean(all_vwap):>8.2f}   (primary baseline)")
+    print(f"  {'POV':12} {np.mean(all_pov):>8.2f}")
+    print(f"  {'TWAP':12} {np.mean(all_twap):>8.2f}   (clock-based, ignores volume)")
+    print(f"  {'Passive':12} {np.mean(all_passive):>8.2f}   (limit-only, forced liq)")
+
     print(f"\nsaved -> {args.out_raw}")
     print(f"saved -> {args.out_seeds}")
     print(f"saved -> {args.out_json}")
