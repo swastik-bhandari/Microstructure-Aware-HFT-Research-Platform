@@ -1,0 +1,34 @@
+{
+  "experiment": "fairness_check_size_aware_action_space",
+  "fill_model": "real_trade_attribution",
+  "action_space": "7 actions (hold + {limit,market} x {small,medium,large})",
+  "tape_file": "trade_tape_eth_20251201.npz",
+  "states_file": "states_eth_20251201.csv",
+  "config": {
+    "runs": 5,
+    "timesteps": 100000,
+    "target_qty": 10.0,
+    "horizon": 60,
+    "eval_episodes": 300,
+    "seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004
+    ]
+  },
+  "results": {
+    "ppo6_sizeaware_mean_bps": 43.417876611101015,
+    "ppo6_sizeaware_std_bps": 4.9817608655136745,
+    "ppo7_sizeaware_mean_bps": 39.5284840087868,
+    "ppo7_sizeaware_std_bps": 1.3063361949378194,
+    "vwap_bps": 41.70936067112883,
+    "twap_bps": 159.73272412725066,
+    "pov_bps": 46.067186384575905,
+    "passive_bps": 218.75432353083465,
+    "best_ppo_vs_vwap_bps": 2.1808766623420297,
+    "stderr_bps": 0.6531680974689097,
+    "ties_vwap": false
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "model": "models/ppo7_sizeaware_seed1000.zip",
+  "n": 12,
+  "seed": 1,
+  "rows": [
+    {
+      "episode": 0,
+      "start_local": 12236,
+      "start_idx_abs": 72715,
+      "ppo_bps": 41.49,
+      "vwap_bps": 45.29,
+      "ppo_minus_vwap": -3.81
+    },
+    {
+      "episode": 1,
+      "start_local": 13235,
+      "start_idx_abs": 73714,
+      "ppo_bps": 42.77,
+      "vwap_bps": 44.41,
+      "ppo_minus_vwap": -1.64
+    },
+    {
+      "episode": 2,
+      "start_local": 19527,
+      "start_idx_abs": 80006,
+      "ppo_bps": 39.77,
+      "vwap_bps": 71.03,
+      "ppo_minus_vwap": -31.26
+    },
+    {
+      "episode": 3,
+      "start_local": 24578,
+      "start_idx_abs": 85057,
+      "ppo_bps": 38.49,
+      "vwap_bps": 33.91,
+      "ppo_minus_vwap": 4.57
+    },
+    {
+      "episode": 4,
+      "start_local": 901,
+      "start_idx_abs": 61380,
+      "ppo_bps": 40.55,
+      "vwap_bps": 43.77,
+      "ppo_minus_vwap": -3.21
+    },
+    {
+      "episode": 5,
+      "start_local": 3727,
+      "start_idx_abs": 64206,
+      "ppo_bps": 50.14,
+      "vwap_bps": 48.18,
+      "ppo_minus_vwap": 1.96
+    },
+    {
+      "episode": 6,
+      "start_local": 21280,
+      "start_idx_abs": 81759,
+      "ppo_bps": 40.98,
+      "vwap_bps": 48.4,
+      "ppo_minus_vwap": -7.41
+    },
+    {
+      "episode": 7,
+      "start_local": 24531,
+      "start_idx_abs": 85010,
+      "ppo_bps": 41.85,
+      "vwap_bps": 46.06,
+      "ppo_minus_vwap": -4.21
+    },
+    {
+      "episode": 8,
+      "start_local": 6444,
+      "start_idx_abs": 66923,
+      "ppo_bps": 39.13,
+      "vwap_bps": 50.01,
+      "ppo_minus_vwap": -10.88
+    },
+    {
+      "episode": 9,
+      "start_local": 8063,
+      "start_idx_abs": 68542,
+      "ppo_bps": 41.46,
+      "vwap_bps": 39.4,
+      "ppo_minus_vwap": 2.05
+    },
+    {
+      "episode": 10,
+      "start_local": 22472,
+      "start_idx_abs": 82951,
+      "ppo_bps": 34.44,
+      "vwap_bps": 37.39,
+      "ppo_minus_vwap": -2.95
+    },
+    {
+      "episode": 11,
+      "start_local": 10946,
+      "start_idx_abs": 71425,
+      "ppo_bps": 27.82,
+      "vwap_bps": 30.72,
+      "ppo_minus_vwap": -2.9
+    }
+  ],
+  "summary": {
+    "ppo_mean": 39.90749999999999,
+    "vwap_mean": 44.88083333333333,
+    "gap_mean": -4.973333333333332,
+    "gap_median": -3.0850000000000044,
+    "ppo_wins": 9,
+    "vwap_wins": 3
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "cell": {
+    "alpha": 0.5,
+    "eta": 0.5
+  },
+  "config": {
+    "seeds": 5,
+    "timesteps": 120000,
+    "eval_episodes": 300
+  },
+  "ppo_mean_bps": 40.99676632819065,
+  "ppo_std_bps": 1.3504215688119872,
+  "vwap_bps": 41.326925431132246,
+  "twap_bps": 44.03325221953932,
+  "gap_vwap_minus_ppo_bps": 0.3301591029415931,
+  "stderr_bps": 0.6752107844059936,
+  "verdict": "tie_converged_artifact",
+  "original_sweep_gap_bps": -25.71
+}

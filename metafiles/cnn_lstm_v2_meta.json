@@ -1,0 +1,19 @@
+{
+  "horizon_s": 30,
+  "seq_len": 60,
+  "move_mult": 1.5,
+  "features": [
+    "spread",
+    "obi",
+    "depth",
+    "volatility",
+    "trade_intensity",
+    "queue_at_best",
+    "mid_return",
+    "mid_accel",
+    "obi_trend",
+    "signed_flow"
+  ],
+  "test_acc": 0.5397255326832792,
+  "majority": 0.5168960524000921
+}
